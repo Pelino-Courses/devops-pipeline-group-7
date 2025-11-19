@@ -27,8 +27,9 @@ jobs:
       - name: Move issue to Backlog
         uses: actions/add-to-project@v1.0.2
         with:
-          project-url: https://github.com/users/samrwanda/projects/1
+          project-url: https://github.com/users/samrwanda/projects/3
           github-token: ${{ secrets.PAT_TOKEN }}
+
 
 
   # Build and test backend
