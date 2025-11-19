@@ -17,7 +17,6 @@ permissions:
   contents: read
   issues: write
   pull-requests: write
-  projects: write
 
 jobs:
   # Auto-move new issues to Backlog
@@ -28,11 +27,8 @@ jobs:
       - name: Move issue to Backlog
         uses: actions/add-to-project@v1.0.2
         with:
-          # Use an org or repo project URL. Replace <PROJECT_NUMBER> with the project id.
-          # Example org-level project URL:
-          # https://github.com/orgs/${{ github.repository_owner }}/projects/<PROJECT_NUMBER>
-          project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/3
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          project-url: https://github.com/users/samrwanda/projects/3
+          github-token: ${{ secrets.PAT_TOKEN }}
 
 
 
@@ -117,10 +113,9 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-      projects: write
     steps:
       - name: Move PR to In Review
         uses: actions/add-to-project@v1.0.2
         with:
-          project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/3
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/YOUR_PROJECT_NUMBER
+          github-token: ${{ secrets.PAT_TOKEN }}
