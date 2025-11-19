@@ -1,0 +1,248 @@
+@startuml polling_database_erd
+
+' Polling System Database ERD - PlantUML Format
+' This file can be rendered at http://www.plantuml.com/plantuml/uml/
+
+!define TABLE(x) class x << (T,#FFAAAA) >>
+!define PK(x) <b><u>x</u></b>
+!define FK(x) <i>x</i>
+
+hide methods
+hide stereotypes
+
+' ============================================================================
+' ENTITIES
+' ============================================================================
+
+TABLE(users) {
+  PK(id): UUID
+  --
+  username: VARCHAR(50) UNIQUE
+  email: VARCHAR(255) UNIQUE
+  password_hash: VARCHAR(255)
+  full_name: VARCHAR(100)
+  role: ENUM(user_role)
+  is_active: BOOLEAN
+  is_verified: BOOLEAN
+  profile_image_url: TEXT
+  bio: TEXT
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  last_login_at: TIMESTAMP
+  email_verified_at: TIMESTAMP
+  banned_at: TIMESTAMP
+  banned_reason: TEXT
+}
+
+TABLE(polls) {
+  PK(id): UUID
+  --
+  title: VARCHAR(255)
+  description: TEXT
+  FK(creator_id): UUID
+  status: ENUM(poll_status)
+  is_public: BOOLEAN
+  is_anonymous: BOOLEAN
+  allow_multiple_votes: BOOLEAN
+  max_votes_per_user: INTEGER
+  starts_at: TIMESTAMP
+  ends_at: TIMESTAMP
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  closed_at: TIMESTAMP
+  view_count: INTEGER
+}
+
+TABLE(poll_options) {
+  PK(id): UUID
+  --
+  FK(poll_id): UUID
+  option_text: VARCHAR(500)
+  option_order: INTEGER
+  image_url: TEXT
+  vote_count: INTEGER
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+TABLE(votes) {
+  PK(id): UUID
+  --
+  FK(poll_id): UUID
+  FK(poll_option_id): UUID
+  FK(user_id): UUID
+  ip_address: INET
+  user_agent: TEXT
+  voted_at: TIMESTAMP
+}
+
+TABLE(reports) {
+  PK(id): UUID
+  --
+  FK(reporter_id): UUID
+  FK(reported_user_id): UUID
+  FK(reported_poll_id): UUID
+  report_type: ENUM(report_type)
+  status: ENUM(report_status)
+  reason: TEXT
+  description: TEXT
+  FK(reviewed_by_id): UUID
+  resolution_notes: TEXT
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  reviewed_at: TIMESTAMP
+  resolved_at: TIMESTAMP
+}
+
+TABLE(admin_logs) {
+  PK(id): UUID
+  --
+  FK(admin_id): UUID
+  action_type: ENUM(admin_action_type)
+  FK(target_user_id): UUID
+  FK(target_poll_id): UUID
+  FK(target_report_id): UUID
+  action_description: TEXT
+  metadata: JSONB
+  ip_address: INET
+  user_agent: TEXT
+  created_at: TIMESTAMP
+}
+
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+' Users relationships
+users "1" -- "0..*" polls : creates >
+users "1" -- "0..*" votes : casts >
+users "1" -- "0..*" reports : submits >
+users "1" -- "0..*" reports : is_reported >
+users "1" -- "0..*" reports : reviews >
+users "1" -- "0..*" admin_logs : performs >
+
+' Polls relationships
+polls "1" *-- "1..*" poll_options : contains >
+polls "1" -- "0..*" votes : receives >
+polls "1" -- "0..*" reports : reported_for >
+polls "1" -- "0..*" admin_logs : target_of >
+
+' Poll options relationships
+poll_options "1" -- "0..*" votes : voted_on >
+
+' Reports relationships
+reports "1" -- "0..*" admin_logs : target_of >
+
+' ============================================================================
+' NOTES
+' ============================================================================
+
+note right of users
+  **User Roles:**
+  - user (default)
+  - moderator
+  - admin
+  
+  **Password:**
+  Store bcrypt/Argon2 hash
+  
+  **Verification:**
+  Email verification required
+  for full access
+end note
+
+note right of polls
+  **Poll Status:**
+  - draft: Not yet published
+  - active: Currently accepting votes
+  - closed: Voting ended
+  - archived: Historical record
+  
+  **Anonymous Voting:**
+  When enabled, user_id in votes
+  may be NULL
+  
+  **Multiple Votes:**
+  Users can vote for multiple
+  options if enabled
+end note
+
+note right of votes
+  **Unique Constraint:**
+  (user_id, poll_option_id)
+  prevents duplicate votes
+  
+  **IP Tracking:**
+  For fraud detection
+  and analytics
+  
+  **Anonymous:**
+  user_id can be NULL for
+  anonymous polls or deleted users
+end note
+
+note right of reports
+  **Report Types:**
+  - poll: Report a poll
+  - comment: Report a comment
+  - user: Report a user
+  - other: Other issues
+  
+  **Status Flow:**
+  pending → reviewed → 
+  resolved/dismissed
+  
+  **Targets:**
+  At least one target
+  (user or poll) required
+end note
+
+note right of admin_logs
+  **Action Types:**
+  - user_* (created, banned, etc.)
+  - poll_* (created, deleted, etc.)
+  - report_* (reviewed, resolved)
+  - content_moderated
+  - settings_changed
+  
+  **Metadata:**
+  JSONB for flexible
+  action-specific data
+  
+  **Audit Trail:**
+  Append-only, never delete
+end note
+
+' ============================================================================
+' LEGEND
+' ============================================================================
+
+legend right
+  **Key:**
+  <b><u>PK</u></b> = Primary Key
+  <i>FK</i> = Foreign Key
+  
+  **Cardinality:**
+  1 = One
+  0..* = Zero or more
+  1..* = One or more
+  
+  **Relationships:**
+  -- = Association
+  *-- = Composition
+  
+  **CASCADE Rules:**
+  ON DELETE CASCADE:
+  - polls → poll_options
+  - polls → votes
+  - users (creator) → polls
+  - users (reported) → reports
+  - poll_options → votes
+  
+  ON DELETE SET NULL:
+  - users → votes
+  - users → reports
+  - users → admin_logs
+endlegend
+
+@enduml
