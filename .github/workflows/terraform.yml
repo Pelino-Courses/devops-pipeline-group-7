@@ -107,7 +107,7 @@ jobs:
           echo "acr_server=$(terraform output -raw acr_login_server)" >> $GITHUB_OUTPUT
 
       - name: Save outputs as artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: terraform-outputs
           path: terraform/terraform-outputs.json
