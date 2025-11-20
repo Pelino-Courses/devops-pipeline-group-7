@@ -1,5 +1,5 @@
 {
-      "name": "Mobile UI Design for MCSS",
+      "name": "mobile-ui-design-for-mcss",
       "version": "0.1.0",
       "private": true,
       "dependencies": {
@@ -63,6 +63,7 @@
       },
       "scripts": {
             "dev": "vite",
-            "build": "vite build"
+            "build": "vite build",
+            "test": "echo \"No tests specified\" && exit 0"
       }
 }
