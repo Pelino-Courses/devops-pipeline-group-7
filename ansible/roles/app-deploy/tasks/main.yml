@@ -28,19 +28,18 @@
     mode: '0600'
 
 - name: Pull latest images
-  community.docker.docker_compose:
-    project_src: /opt/devops-app
-    pull: yes
+  shell: docker compose pull
+  args:
+    chdir: /opt/devops-app
 
 - name: Start application containers
-  community.docker.docker_compose:
-    project_src: /opt/devops-app
-    state: present
-    restarted: yes
+  shell: docker compose up -d --force-recreate
+  args:
+    chdir: /opt/devops-app
 
 - name: Wait for application to be ready
   uri:
-    url: "http://localhost:3000/health"
+    url: "http://localhost:3000/make-server-af101b5e/health"
     status_code: 200
   register: result
   until: result.status == 200
