@@ -1,34 +1,3 @@
-# Import existing resources into Terraform state
-import {
-  to = azurerm_resource_group.main
-  id = "/subscriptions/4e417447-6ad7-4489-b944-c48c5e09cbeb/resourceGroups/devops-pipeline-dev-rg"
-}
-
-import {
-  to = azurerm_virtual_network.main
-  id = "/subscriptions/4e417447-6ad7-4489-b944-c48c5e09cbeb/resourceGroups/devops-pipeline-dev-rg/providers/Microsoft.Network/virtualNetworks/devops-pipeline-dev-vnet"
-}
-
-import {
-  to = azurerm_ssh_public_key.main
-  id = "/subscriptions/4e417447-6ad7-4489-b944-c48c5e09cbeb/resourceGroups/devops-pipeline-dev-rg/providers/Microsoft.Compute/sshPublicKeys/devops-pipeline-dev-sshkey"
-}
-
-import {
-  to = azurerm_public_ip.main
-  id = "/subscriptions/4e417447-6ad7-4489-b944-c48c5e09cbeb/resourceGroups/devops-pipeline-dev-rg/providers/Microsoft.Network/publicIPAddresses/devops-pipeline-dev-pip"
-}
-
-import {
-  to = azurerm_container_registry.main
-  id = "/subscriptions/4e417447-6ad7-4489-b944-c48c5e09cbeb/resourceGroups/devops-pipeline-dev-rg/providers/Microsoft.ContainerRegistry/registries/devopspipelinedevacr"
-}
-
-import {
-  to = azurerm_network_security_group.main
-  id = "/subscriptions/4e417447-6ad7-4489-b944-c48c5e09cbeb/resourceGroups/devops-pipeline-dev-rg/providers/Microsoft.Network/networkSecurityGroups/devops-pipeline-dev-nsg"
-}
-
 # Resource Group
 resource "azurerm_resource_group" "main" {
   name     = "${var.project_name}-${var.environment}-rg"
