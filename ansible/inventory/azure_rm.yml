@@ -1,0 +1,5 @@
+plugin: azure.azcollection.azure_rm
+include_vm_resource_groups:
+  - devops-pipeline-dev-rg
+auth_source: auto
+plain_host_names: yes

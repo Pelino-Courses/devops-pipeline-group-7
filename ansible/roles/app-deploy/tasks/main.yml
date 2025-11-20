@@ -1,0 +1,50 @@
+---
+- name: Create application directory
+  file:
+    path: /opt/devops-app
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: docker
+    mode: '0755'
+
+- name: Login to Azure Container Registry
+  shell: |
+    az acr login --name {{ acr_name }}
+  environment:
+    AZURE_CLIENT_ID: "{{ lookup('env', 'ARM_CLIENT_ID') }}"
+    AZURE_CLIENT_SECRET: "{{ lookup('env', 'ARM_CLIENT_SECRET') }}"
+    AZURE_TENANT_ID: "{{ lookup('env', 'ARM_TENANT_ID') }}"
+
+- name: Create docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/devops-app/docker-compose.yml
+    owner: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Create environment file
+  template:
+    src: .env.j2
+    dest: /opt/devops-app/.env
+    owner: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Pull latest images
+  community.docker.docker_compose:
+    project_src: /opt/devops-app
+    pull: yes
+
+- name: Start application containers
+  community.docker.docker_compose:
+    project_src: /opt/devops-app
+    state: present
+    restarted: yes
+
+- name: Wait for application to be ready
+  uri:
+    url: "http://localhost:3000/health"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 30
+  delay: 2
