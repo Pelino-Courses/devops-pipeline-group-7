@@ -8,12 +8,10 @@
     mode: '0755'
 
 - name: Login to Azure Container Registry
-  shell: |
-    az acr login --name {{ acr_name }}
-  environment:
-    AZURE_CLIENT_ID: "{{ lookup('env', 'ARM_CLIENT_ID') }}"
-    AZURE_CLIENT_SECRET: "{{ lookup('env', 'ARM_CLIENT_SECRET') }}"
-    AZURE_TENANT_ID: "{{ lookup('env', 'ARM_TENANT_ID') }}"
+  community.docker.docker_login:
+    registry_url: "{{ acr_login_server }}"
+    username: "{{ acr_username }}"
+    password: "{{ acr_password }}"
 
 - name: Create docker-compose file
   template:

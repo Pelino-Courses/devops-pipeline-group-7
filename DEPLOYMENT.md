@@ -109,19 +109,6 @@ terraform output vm_public_ip
 ### 4.2 Test SSH Connection
 ```bash
 ssh azureuser@<VM_PUBLIC_IP>
-```
-
-### 4.3 Run Ansible Playbook
-In WSL/Linux:
-```bash
-cd ansible
-ansible-playbook playbooks/setup-server.yml -i inventory/azure_rm.yml
-```
-
-## Step 5: Verify Deployment
-
-### 5.1 Check Application Health
-```bash
 curl http://<VM_PUBLIC_IP>:3000/health
 ```
 
