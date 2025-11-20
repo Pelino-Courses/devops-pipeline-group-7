@@ -1,7 +1,7 @@
 terraform {
   cloud {
     organization = "GROUP-7"
-    
+
     workspaces {
       name = "devops-pipeline-infrastructure"
     }
