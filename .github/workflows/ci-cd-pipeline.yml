@@ -19,16 +19,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Auto-move new issues to Backlog
-  issue-automation:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'issues'
-    steps:
-      - name: Move issue to Backlog
-        uses: actions/add-to-project@v1.0.2
-        with:
-          project-url: https://github.com/users/samrwanda/projects/3
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   # Build and test application
   build-and-test:
@@ -89,16 +79,4 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # Move PR to "In Review" when opened
-  pr-to-review:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Move PR to In Review
-        uses: actions/add-to-project@v1.0.2
-        with:
-          project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/YOUR_PROJECT_NUMBER
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+
