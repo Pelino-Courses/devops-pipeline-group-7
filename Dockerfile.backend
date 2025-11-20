@@ -1,0 +1,15 @@
+FROM denoland/deno:alpine
+
+WORKDIR /app
+
+# Copy backend source code
+COPY src/supabase/functions/server/ ./src/supabase/functions/server/
+
+# Set environment variables
+ENV PORT=3000
+
+# Expose port
+EXPOSE 3000
+
+# Run the server
+CMD ["run", "--allow-net", "--allow-env", "--allow-read", "src/supabase/functions/server/index.tsx"]
