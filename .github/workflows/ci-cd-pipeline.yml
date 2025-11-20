@@ -12,7 +12,7 @@ on:
     types: [opened, synchronize, reopened]
   issues:
     types: [opened, reopened]
-
+ 
 permissions:
   contents: read
   issues: write
