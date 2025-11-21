@@ -131,6 +131,7 @@ jobs:
           sarif_file: tfsec.sarif
 
       - name: Scan Ansible playbooks
-        uses: ansible-community/ansible-lint-action@main
+        uses: ansible/ansible-lint@main
         with:
           targets: "ansible/playbooks/"
+
