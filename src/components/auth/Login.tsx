@@ -102,7 +102,7 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
 
                   <Button
                     type="submit"
-                    className="w-full bg-black-500 hover:bg-black-600"
+                    className="w-full bg-red-500 hover:bg-red-600"
                     disabled={loading}
                   >
                     {loading ? 'Logging in...' : 'Login'}
