@@ -50,3 +50,46 @@ jobs:
           file: Dockerfile.backend
           push: true
           tags: ${{ env.ACR_LOGIN_SERVER }}/devops-backend:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
+
+      - name: Get ACR Credentials
+        id: acr_creds
+        run: |
+          CREDS=$(az acr credential show --name ${{ env.ACR_NAME }} --query "{username:username, password:passwords[0].value}" -o json)
+          echo "username=$(echo $CREDS | jq -r .username)" >> $GITHUB_OUTPUT
+          echo "password=$(echo $CREDS | jq -r .password)" >> $GITHUB_OUTPUT
+
+      - name: Deploy to Azure VM
+        run: |
+          # Get VM IP from Azure
+          VM_IP=$(az vm list-ip-addresses --resource-group devops-pipeline-dev-rg --name devops-pipeline-dev-vm --query "[0].virtualMachine.network.publicIpAddresses[0].ipAddress" -o tsv)
+          
+          # Create SSH key file
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+          
+          # SSH into VM and deploy
+          ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key azureuser@$VM_IP << 'EOF'
+            # Login to ACR
+            echo "${{ steps.acr_creds.outputs.password }}" | docker login ${{ env.ACR_LOGIN_SERVER }} -u ${{ steps.acr_creds.outputs.username }} --password-stdin
+            
+            # Navigate to app directory and pull latest images
+            cd /opt/devops-app
+            docker compose pull
+            docker compose up -d --force-recreate
+            
+            # Clean up old images
+            docker image prune -f
+          EOF
+          
+          # Clean up SSH key
+          rm /tmp/ssh_key
+
