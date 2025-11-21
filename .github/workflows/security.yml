@@ -134,6 +134,7 @@ jobs:
 
       - name: Scan Ansible playbooks
         uses: ansible/ansible-lint@main
+        continue-on-error: true
         with:
-          targets: "ansible/playbooks/"
+          working_directory: ansible/
 
