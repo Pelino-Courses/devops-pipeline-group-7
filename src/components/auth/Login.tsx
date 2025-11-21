@@ -130,7 +130,8 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
         </Card>
 
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">Available in English & Kinyarwanda</p>
+          <p className="text-xs text-gray-500"> 
+            Available in English & Kinyarwanda</p>
         </div>
       </div>
     </div>
