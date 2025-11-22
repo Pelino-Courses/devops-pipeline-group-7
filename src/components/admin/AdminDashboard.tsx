@@ -51,7 +51,7 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
             }`}
           >
             <Home className="w-5 h-5" />
-            <span className="text-xs">Home</span>
+            <span className="text-xs">Home </span>
           </button>
           
           <button
